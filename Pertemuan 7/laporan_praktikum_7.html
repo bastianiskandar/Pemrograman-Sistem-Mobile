@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Laporan Praktikum 7 - Pemrograman Mobile</title>
+<style>
+
+  @page {
+    size: A4;
+    margin: 14mm 15mm 14mm 15mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.5;
+    font-size: 10pt;
+    padding: 0;
+    margin: 0;
+  }
+  h1 {
+    color: #0f172a;
+    font-size: 18pt;
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  h2 {
+    color: #1d4ed8;
+    font-size: 13pt;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 3px;
+    page-break-after: avoid;
+  }
+  h3 {
+    color: #334155;
+    font-size: 11pt;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    page-break-after: avoid;
+  }
+  p {
+    margin-top: 3px;
+    margin-bottom: 6px;
+    text-align: justify;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 8.8pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  pre {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #2563eb;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 8pt;
+    font-family: "Cascadia Code", "Consolas", "Courier New", monospace;
+    overflow-x: auto;
+    page-break-inside: avoid;
+    line-height: 1.38;
+    margin: 6px 0;
+  }
+  code {
+    font-family: "Cascadia Code", "Consolas", "Courier New", monospace;
+    font-size: 8.5pt;
+    background-color: #f1f5f9;
+    padding: 2px 4px;
+    border-radius: 3px;
+    color: #0f172a;
+  }
+  pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+  }
+  ul, ol {
+    margin-top: 3px;
+    margin-bottom: 6px;
+    padding-left: 18px;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 12px 0;
+  }
+
+</style>
+</head>
+<body>
+<h1>LAPORAN PRAKTIKUM PEMROGRAMAN MOBILE</h1>
+<h2>Pertemuan 7 — HTTP Networking &amp; Konsumsi REST API</h2>
+<hr />
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Nama Mahasiswa</strong></td>
+<td style="text-align: left;">Bastian Yusuf Iskandar</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>NIM</strong></td>
+<td style="text-align: left;">3337240088</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mata Kuliah</strong></td>
+<td style="text-align: left;">Pemrograman Mobile</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Pertemuan</strong></td>
+<td style="text-align: left;">Pertemuan 7</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Topik</strong></td>
+<td style="text-align: left;">HTTP Networking &amp; Konsumsi REST API</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Studi Kasus Project</strong></td>
+<td style="text-align: left;">TokoKita — mengambil data produk sungguhan dari REST API</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Framework</strong></td>
+<td style="text-align: left;">Flutter (Dart) — package <code>http</code> &amp; <code>GetX</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Alokasi Waktu</strong></td>
+<td style="text-align: left;">170 menit (3 SKS)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>A. Tujuan Praktikum</h2>
+<ol>
+<li><strong>Mahasiswa mampu menggunakan package <code>http</code> untuk melakukan request ke REST API</strong>: Mengirim HTTP GET request secara asynchronous ke endpoint publik Fake Store API (<code>https://fakestoreapi.com/products</code>).</li>
+<li><strong>Mahasiswa mampu melakukan request GET dan POST beserta penanganan response-nya</strong>: Mengelola komunikasi client-server dengan async/await, memeriksa header, status code, dan payload body response.</li>
+<li><strong>Mahasiswa mampu melakukan parsing JSON menggunakan <code>jsonDecode</code>/<code>jsonEncode</code> serta mengadaptasi model class dengan <code>fromJson</code>/<code>toJson</code></strong>: Mengonversi JSON string mentah menjadi Map/List di Dart, memetakan perbedaan struktur data API ke properti class <code>Product</code> (Pertemuan 2), dan menjaga integritas type safety serta null safety.</li>
+<li><strong>Mahasiswa mampu menampilkan data asynchronous menggunakan <code>async</code>/<code>await</code> dan <code>FutureBuilder</code></strong>: Membangun antarmuka yang reaktif terhadap status Future (<code>waiting</code>, <code>error</code>, <code>hasData</code>) dengan widget <code>FutureBuilder</code>, menampilkan indikator pemuatan (<code>CircularProgressIndicator</code>), dan me-render daftar produk riil menggunakan <code>ListView.builder</code> dan <code>ProductCard</code>.</li>
+<li><strong>Mahasiswa mampu menerapkan penanganan error dasar (<code>try-catch</code>, pengecekan status code) pada proses networking</strong>: Mengantisipasi kegagalan jaringan seperti hilangnya koneksi internet (<code>SocketException</code>), batas waktu habis (<code>TimeoutException</code>), kesalahan format (<code>FormatException</code>), dan error respons dari server (HTTP status 404/500), serta menyediakan tombol "Coba Lagi" yang interaktif bagi pengguna.</li>
+</ol>
+<hr />
+<h2>B. Alat dan Bahan</h2>
+<h3>B.1 Perangkat &amp; Lingkungan Pengembangan</h3>
+<ul>
+<li>Laptop/PC dengan proyek <strong>TokoKita</strong> hasil pertemuan sebelumnya (Pertemuan 1 sampai Pertemuan 6).</li>
+<li>Editor kode: Visual Studio Code / Android Studio.</li>
+<li>Perangkat pengujian: Android Emulator / Windows Desktop / Google Chrome.</li>
+<li>SDK: Flutter 3.47.2 &amp; Dart 3.13.2.</li>
+<li>Package <code>http</code> versi <code>^1.6.0</code> dan <code>get</code> versi <code>^4.7.3</code> pada <code>pubspec.yaml</code>.</li>
+<li>REST API Publik: Fake Store API (<code>https://fakestoreapi.com/products</code>).</li>
+</ul>
+<h3>B.2 Konfigurasi Dependensi (<code>pubspec.yaml</code>)</h3>
+<pre><code class="language-yaml">name: tokokita
+description: &quot;A new Flutter project.&quot;
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  http: ^1.6.0       # Package utama untuk HTTP Networking (Langkah 1)
+  get: ^4.7.3        # State Management &amp; Routing dari Pertemuan 6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+</code></pre>
+<h3>B.3 Struktur Berkas yang Dibuat / Diperbarui</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">No</th>
+<th style="text-align: left;">Berkas</th>
+<th style="text-align: center;">Status</th>
+<th style="text-align: left;">Peran &amp; Deskripsi Sinkronisasi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;"><code>lib/services/product_service.dart</code></td>
+<td style="text-align: center;"><strong>Baru</strong></td>
+<td style="text-align: left;">Service layer untuk HTTP networking (<code>fetchProducts</code>, <code>fetchProductDetail</code>, error handling, try-catch, dan mock client support).</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;"><code>lib/models/product.dart</code></td>
+<td style="text-align: center;">Diperbarui</td>
+<td style="text-align: left;">Menambahkan factory constructor <code>Product.fromJson()</code> dan method <code>toJson()</code> yang memetakan payload Fake Store API (<code>title</code>, <code>price</code>, <code>image</code>, <code>rating</code>) ke model class TokoKita tanpa merusak fungsionalitas dummy data Pertemuan 2.</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;"><code>lib/screens/home_page.dart</code></td>
+<td style="text-align: center;">Diperbarui</td>
+<td style="text-align: left;">Menggantikan dummy data lokal dengan <code>FutureBuilder&lt;List&lt;Product&gt;&gt;</code>, mengintegrasikan <code>CircularProgressIndicator</code>, UI error dengan tombol "Coba Lagi", <code>RefreshIndicator</code> (pull-to-refresh), dan tombol uji simulasi error.</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: left;"><code>lib/screens/product_detail_page.dart</code></td>
+<td style="text-align: center;">Diperbarui</td>
+<td style="text-align: left;">Mendukung pemuatan data via parameter objek <code>Product</code> maupun fetch detail langsung berdasarkan <code>productId</code> menggunakan <code>FutureBuilder&lt;Product&gt;</code> (Tugas Mandiri 1), serta mendukung rendering gambar jaringan <code>Image.network</code>.</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: left;"><code>lib/widgets/product_card.dart</code></td>
+<td style="text-align: center;">Diperbarui</td>
+<td style="text-align: left;">Menampilkan gambar produk riil via <code>Image.network</code> jika URL gambar tersedia, dengan fallback elegan ke ikon kategori jika URL kosong atau terjadi galat jaringan.</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: left;"><code>test/widget_test.dart</code></td>
+<td style="text-align: center;">Diperbarui</td>
+<td style="text-align: left;">Menambahkan 8 unit &amp; widget test baru untuk Pertemuan 7 serta mempertahankan seluruh 9 pengujian Pertemuan 1-6 (Total 17 skenario lulus 100%).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>C. Dasar Teori Singkat</h2>
+<p>Pada tahapan sebelumnya (Pertemuan 2 hingga Pertemuan 6), aplikasi TokoKita masih mengandalkan data dummy statis yang ditulis langsung pada kode program (<code>dummyProducts</code>). Dalam aplikasi toko daring berskala produksi, data katalog produk bersifat dinamis dan tersimpan di basis data terpusat pada server, sehingga pembaruan harga, stok, maupun produk baru dapat langsung dinikmati pengguna tanpa perlu memperbarui atau merilis ulang aplikasi di Play Store / App Store.</p>
+<h3>C.1 HTTP Networking &amp; REST API pada Flutter</h3>
+<p>Komunikasi antara aplikasi mobile (client) dan server terjadi melalui protokol HTTP/HTTPS berbasis arsitektur REST (<em>Representational State Transfer</em>). Data ditransmisikan menggunakan method standar:<br />
+- <strong><code>GET</code></strong>: Mengambil atau membaca data dari server.<br />
+- <strong><code>POST</code></strong>: Mengirim data baru ke server.<br />
+- <strong><code>PUT</code>/<code>PATCH</code></strong>: Memperbarui data yang ada di server.<br />
+- <strong><code>DELETE</code></strong>: Menghapus data dari server.</p>
+<p>Package <code>http</code> dari tim resmi Dart (<code>package:http/http.dart</code>) menyediakan antarmuka tingkat tinggi untuk menjalankan request HTTP:</p>
+<pre><code class="language-dart">final response = await http.get(Uri.parse('https://fakestoreapi.com/products'));
+</code></pre>
+<h3>C.2 Operasi Asynchronous &amp; Widget <code>FutureBuilder</code></h3>
+<p>Request HTTP memiliki jeda waktu (<em>network latency</em>) yang bergantung pada kecepatan koneksi internet dan responsivitas server. Oleh karena itu, eksekusi operasi ini dilakukan secara asynchronous menggunakan tipe data <code>Future</code> dan kata kunci <code>async</code>/<code>await</code> agar antarmuka aplikasi tidak membeku (<em>non-blocking UI</em>).</p>
+<p>Untuk menampilkan data dari <code>Future</code> secara otomatis, Flutter menyediakan widget <code>FutureBuilder&lt;T&gt;</code> yang memonitor siklus hidup <code>AsyncSnapshot&lt;T&gt;</code>:</p>
+<pre><code>  [Inisialisasi Future]
+           │
+           ▼
+ConnectionState.waiting ───► Tampilkan CircularProgressIndicator (Loading)
+           │
+     ┌─────┴────────────────────────┐
+     ▼                              ▼
+snapshot.hasError              snapshot.hasData
+     │                              │
+     ▼                              ▼
+Tampilkan Pesan Error          Tampilkan ListView.builder
+&amp; Tombol &quot;Coba Lagi&quot;           berisi ProductCard
+</code></pre>
+<h3>C.3 Serialisasi &amp; Deserialisasi JSON</h3>
+<p>Data yang dikirim oleh REST API umumnya berformat teks JSON (<em>JavaScript Object Notation</em>).<br />
+- <strong>Deserialisasi (<code>jsonDecode</code>)</strong>: Mengubah teks string JSON menjadi tipe data Dart (<code>Map&lt;String, dynamic&gt;</code> atau <code>List&lt;dynamic&gt;</code>).<br />
+- <strong>Mapping (<code>fromJson</code>)</strong>: Mengonversi <code>Map&lt;String, dynamic&gt;</code> ke dalam objek model strongly-typed (<code>Product</code>).<br />
+- <strong>Serialisasi (<code>toJson</code> &amp; <code>jsonEncode</code>)</strong>: Mengubah objek model kembali menjadi Map dan teks string JSON.</p>
+<hr />
+<h2>D. Langkah Kerja &amp; Implementasi Kode</h2>
+<h3>Langkah 1 — Setup Package <code>http</code></h3>
+<ol>
+<li>Memastikan package <code>http: ^1.6.0</code> telah terdaftar pada berkas <code>pubspec.yaml</code> di bawah blok <code>dependencies</code>.</li>
+<li>Menjalankan perintah terminal di direktori proyek:<br />
+<code>bash
+   flutter pub get</code></li>
+<li>Membuat berkas baru <code>lib/services/product_service.dart</code> yang bertindak sebagai layer <em>Service Repository</em> untuk mengisolasi logika networking dari UI widget.</li>
+</ol>
+<hr />
+<h3>Langkah 2 — Request GET Data Produk</h3>
+<ol>
+<li>Membuat fungsi asynchronous <code>fetchProducts()</code> di dalam <code>ProductService</code> yang mengirim request <code>http.get()</code> ke endpoint <code>https://fakestoreapi.com/products</code>.</li>
+<li>Menggunakan <code>async/await</code> untuk menunggu respons, lalu mencetak <code>response.statusCode</code> dan preview <code>response.body</code> pada console untuk memverifikasi data yang diterima:<br />
+   ```dart<br />
+   final response = await activeClient<br />
+       .get(Uri.parse(endpoint))<br />
+       .timeout(const Duration(seconds: 15));</li>
+</ol>
+<p>print('[ProductService] Response StatusCode: ${response.statusCode}');<br />
+   print('[ProductService] Response Body Preview:\n${response.body.substring(0, 200)}...');<br />
+   ```</p>
+<hr />
+<h3>Langkah 3 — Menyesuaikan Model Product &amp; Parsing JSON</h3>
+<ol>
+<li>Membuka <code>lib/models/product.dart</code> dan menambahkan factory constructor <code>Product.fromJson(Map&lt;String, dynamic&gt; json)</code> pada class <code>Product</code>.</li>
+<li>Melakukan adaptasi dan normalisasi terhadap perbedaan field Fake Store API dengan model TokoKita:</li>
+<li>Field <code>title</code> pada API dipetakan ke properti <code>name</code>.</li>
+<li>Field <code>image</code> pada API dipetakan ke properti <code>imageUrl</code>.</li>
+<li>Field <code>price</code> dari API (dollar) dikonversikan ke satuan Rupiah (kurs Rp 15.000) agar sinkron dengan fungsi <code>formatRupiah()</code> dan sistem keranjang TokoKita.</li>
+<li>Field <code>stock</code> yang tidak disediakan oleh Fake Store API diberikan nilai fallback cerdas dari <code>rating['count']</code> atau default <code>20</code>.</li>
+<li>Field <code>category</code> API ("men's clothing", "electronics", dll.) dinormalisasi ke kategori TokoKita ("Fashion", "Elektronik").</li>
+<li>
+<p>Mengimplementasikan method <code>toJson()</code> untuk serialisasi data:<br />
+   ```dart<br />
+   factory Product.fromJson(Map<String, dynamic> json, {bool convertCurrency = true}) {<br />
+     final num rawPrice = json['price'] as num? ?? 0.0;<br />
+     final double finalPrice = (convertCurrency &amp;&amp; rawPrice &lt; 1000 &amp;&amp; rawPrice &gt; 0)<br />
+         ? (rawPrice * 15000).roundToDouble()<br />
+         : rawPrice.toDouble();</p>
+<p>return Product(<br />
+   id: json['id'] as int? ?? 0,<br />
+   name: json['title'] as String? ?? json['name'] as String? ?? 'Produk Tanpa Nama',<br />
+   price: finalPrice,<br />
+   category: _normalizeCategory(json['category'] as String? ?? 'Umum'),<br />
+   stock: json['stock'] as int? ??<br />
+       (json['rating'] != null &amp;&amp; json['rating']['count'] != null<br />
+           ? (json['rating']['count'] as num).toInt()<br />
+           : 20),<br />
+   imageUrl: json['image'] as String? ?? json['imageUrl'] as String?,<br />
+   description: json['description'] as String?,<br />
+ );<br />
+   }</p>
+</li>
+</ol>
+<p>Map<String, dynamic> toJson() {<br />
+     return {<br />
+       'id': id,<br />
+       'title': name,<br />
+       'price': price,<br />
+       'category': category,<br />
+       'stock': stock,<br />
+       'image': imageUrl,<br />
+       'description': description,<br />
+     };<br />
+   }<br />
+<code>4. Di dalam `product_service.dart`, mem-parsing body respons menggunakan `jsonDecode`:</code>dart<br />
+   if (response.statusCode == 200) {<br />
+     final List<dynamic> jsonList = jsonDecode(response.body);<br />
+     final List<Product> products = jsonList<br />
+         .map((item) =&gt; Product.fromJson(item as Map<String, dynamic>))<br />
+         .toList();<br />
+     return products;<br />
+   }<br />
+   ```</p>
+<hr />
+<h3>Langkah 4 — Menampilkan Data Asli pada <code>HomePage</code> dengan <code>FutureBuilder</code></h3>
+<ol>
+<li>Pada <code>lib/screens/home_page.dart</code>, menggantikan array produk dummy dengan variabel state <code>late Future&lt;List&lt;Product&gt;&gt; _productsFuture;</code>.</li>
+<li>Menginisialisasi <code>_productsFuture</code> pada method <code>initState()</code> dengan memanggil <code>ProductService.fetchProducts()</code>.</li>
+<li>Membangun tampilan daftar produk menggunakan widget <code>FutureBuilder&lt;List&lt;Product&gt;&gt;</code>:</li>
+<li><strong>Kondisi Waiting</strong>: Menampilkan indikator loading <code>CircularProgressIndicator</code> di tengah layar dengan teks status.</li>
+<li><strong>Kondisi HasData</strong>: Me-render data hasil fetch menggunakan <code>ListView.builder</code> dan widget <code>ProductCard</code> yang telah dirancang pada Pertemuan 4 tanpa mengubah struktur dasar kartu produk.</li>
+<li><strong>Integrasi Gambar</strong>: <code>ProductCard</code> dan <code>ProductDetailPage</code> diperkaya untuk merender URL gambar jaringan melalui <code>Image.network</code> dengan <code>loadingBuilder</code> dan <code>errorBuilder</code> fallback.</li>
+</ol>
+<pre><code class="language-dart">Expanded(
+  child: FutureBuilder&lt;List&lt;Product&gt;&gt;(
+    future: _productsFuture,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting &amp;&amp; _cachedProducts == null) {
+        return const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation&lt;Color&gt;(Color(0xFF1976D2)),
+              ),
+              SizedBox(height: 18),
+              Text(
+                'Memuat produk dari Fake Store API...',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        );
+      }
+
+      if (snapshot.hasError &amp;&amp; _cachedProducts == null) {
+        return _buildErrorState(snapshot.error.toString());
+      }
+
+      final allProducts = _cachedProducts ?? snapshot.data ?? [];
+      return ListView.builder(
+        itemCount: allProducts.length,
+        itemBuilder: (context, index) =&gt; ProductCard(product: allProducts[index]),
+      );
+    },
+  ),
+)
+</code></pre>
+<hr />
+<h3>Langkah 5 — Penanganan Error pada Pengambilan Data</h3>
+<ol>
+<li>Membungkus seluruh proses request HTTP pada <code>ProductService.fetchProducts()</code> dengan blok <code>try-catch</code> terstruktur yang menangani berbagai jenis kegagalan jaringan:</li>
+<li><code>SocketException</code>: Ditangkap saat perangkat tidak memiliki koneksi internet atau DNS server gagal merespons.</li>
+<li><code>TimeoutException</code>: Ditangkap jika latensi jaringan melebihi ambang batas 15 detik.</li>
+<li><code>FormatException</code>: Ditangkap jika format data bukan JSON valid.</li>
+<li><code>HttpException</code>: Dilempar jika server mengembalikan HTTP status selain 200 (misal 404 atau 500).</li>
+<li>Menyediakan tombol <strong>Simulasi Error</strong> (ikon serangga/bug pada header <code>HomePage</code>) yang menembak endpoint keliru (<code>/invalid_endpoint_error</code>) untuk menguji skenario kegagalan secara interaktif.</li>
+<li>Menampilkan pesan error yang ramah pengguna (<em>user-friendly error UI</em>) lengkap dengan ikon ilustrasi kegagalan dan tombol <strong>"Coba Lagi"</strong> yang secara otomatis memanggil ulang <code>_loadProducts(simulateError: false)</code>.</li>
+</ol>
+<hr />
+<h2>E. Hasil Pengamatan</h2>
+<p>Berikut adalah rekapitulasi hasil pengujian skenario networking pada aplikasi TokoKita:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">No</th>
+<th style="text-align: left;">Jenis Request / Skenario</th>
+<th style="text-align: center;">Status Code / Hasil</th>
+<th style="text-align: left;">Penjelasan &amp; Bukti Verifikasi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;"><strong>GET data produk dari Fake Store API</strong></td>
+<td style="text-align: center;"><strong>200 OK</strong></td>
+<td style="text-align: left;">Endpoint <code>https://fakestoreapi.com/products</code> berhasil merespons dengan status 200. Panjang payload <code>response.body</code> sebesar 10.634 karakter berisi 20 produk katalog lengkap.</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;"><strong>Parsing JSON ke <code>Product.fromJson</code></strong></td>
+<td style="text-align: center;"><strong>Berhasil</strong></td>
+<td style="text-align: left;">Seluruh 20 item JSON berhasil dipetakan ke dalam objek <code>Product</code>. Field <code>title</code> dipetakan ke <code>name</code>, <code>image</code> ke <code>imageUrl</code>, <code>rating.count</code> menjadi fallback <code>stock</code>, serta harga dollar terkonversi ke Rupiah.</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;"><strong>Tampilan produk asli via <code>FutureBuilder</code></strong></td>
+<td style="text-align: center;"><strong>Berhasil</strong></td>
+<td style="text-align: left;"><code>FutureBuilder</code> secara dinamis menampilkan animasi <code>CircularProgressIndicator</code> saat request berlangsung, lalu me-render 20 kartu produk asli di <code>ListView.builder</code> lengkap dengan gambar produk dan kategori.</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: left;"><strong>Simulasi error (URL salah / tanpa koneksi)</strong></td>
+<td style="text-align: center;"><strong>404 Not Found / SocketException</strong></td>
+<td style="text-align: left;">Saat simulasi error diaktifkan (menembak <code>/invalid_endpoint_error</code>), try-catch menangkap galat dan <code>FutureBuilder</code> menampilkan UI ramah pengguna: <em>"Gagal Memuat Produk: Server mengembalikan respons error dengan Status Code: 404"</em>.</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: left;"><strong>Tombol Coba Lagi setelah error</strong></td>
+<td style="text-align: center;"><strong>200 OK (Pulih)</strong></td>
+<td style="text-align: left;">Menekan tombol "Coba Lagi" memanggil ulang <code>_loadProducts(simulateError: false)</code>. Request kembali dikirim ke endpoint valid dan daftar produk pulih secara instan.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>F. Tugas Mandiri</h2>
+<h3>1. Function <code>fetchProductDetail(int id)</code> pada <code>ProductDetailPage</code></h3>
+<p><strong>Implementasi pada <code>ProductService</code>:</strong></p>
+<pre><code class="language-dart">static Future&lt;Product&gt; fetchProductDetail(int id, {String? customUrl, bool simulateError = false}) async {
+  final endpoint = simulateError ? '$errorUrl/$id' : (customUrl ?? '$baseUrl/products/$id');
+  final response = await client.get(Uri.parse(endpoint)).timeout(const Duration(seconds: 15));
+
+  if (response.statusCode == 200) {
+    final Map&lt;String, dynamic&gt; jsonMap = jsonDecode(response.body);
+    return Product.fromJson(jsonMap);
+  } else {
+    throw HttpException('Gagal memuat detail produk #$id (Status Code: ${response.statusCode})');
+  }
+}
+</code></pre>
+<p><strong>Penerapan pada <code>ProductDetailPage</code>:</strong><br />
+Halaman <code>ProductDetailPage</code> mendukung navigasi dengan hanya mengirimkan <code>productId</code> (misal <code>ProductDetailPage(productId: 1)</code>). Jika objek <code>product</code> utuh belum ada, halaman akan menggunakan <code>FutureBuilder&lt;Product&gt;</code> untuk mengambil detail langsung dari Fake Store API:</p>
+<pre><code class="language-dart">if (resolvedProduct == null &amp;&amp; resolvedId != null) {
+  _detailFuture ??= ProductService.fetchProductDetail(resolvedId);
+  return FutureBuilder&lt;Product&gt;(
+    future: _detailFuture,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (snapshot.hasError) {
+        return Center(child: Text('Gagal memuat detail produk: ${snapshot.error}'));
+      }
+      return _buildProductDetailScaffold(snapshot.data!);
+    },
+  );
+}
+</code></pre>
+<p>Selain itu, disediakan pula tombol aksi sinkronisasi (<code>Icons.sync_rounded</code>) pada AppBar agar pengguna dapat memperbarui detail produk langsung dari server kapan saja.</p>
+<hr />
+<h3>2. Penerapan Pull-to-Refresh (<code>RefreshIndicator</code>) pada <code>HomePage</code></h3>
+<p>Widget <code>RefreshIndicator</code> membungkus <code>ListView.builder</code> pada <code>HomePage</code>:</p>
+<pre><code class="language-dart">RefreshIndicator(
+  onRefresh: _handleRefresh,
+  color: const Color(0xFF1976D2),
+  child: ListView.builder(
+    physics: const AlwaysScrollableScrollPhysics(),
+    itemCount: filtered.length,
+    itemBuilder: (context, index) {
+      return ProductCard(product: filtered[index]);
+    },
+  ),
+)
+</code></pre>
+<p><strong>Mekanisme Kerja:</strong><br />
+Saat pengguna menarik layar ke bawah (<em>pull down gesture</em>), <code>RefreshIndicator</code> memicu callback <code>_handleRefresh()</code>. Method ini memanggil ulang <code>ProductService.fetchProducts()</code> dan menanti respons selesai (<code>await _productsFuture</code>). Begitu data terbaru tiba, state diperbarui dan indikator refresh memudar secara mulus. <code>AlwaysScrollableScrollPhysics</code> diterapkan agar aksi pull-to-refresh tetap aktif meskipun jumlah produk sedikit atau layar belum penuh.</p>
+<hr />
+<h3>3. Alur Lengkap Request-Parsing-Tampilkan Data pada TokoKita</h3>
+<p>Berikut adalah diagram alur sekuensial dari pemanggilan pertama hingga data tampil di layar:</p>
+<pre><code>[1] User Membuka HomePage
+       │
+       ▼
+[2] initState() memicu _loadProducts()
+       │
+       ▼
+[3] ProductService.fetchProducts()
+       │  ─── Mengirim HTTP GET ke https://fakestoreapi.com/products
+       ▼
+[4] FutureBuilder(future: _productsFuture)
+       │  ─── connectionState == waiting ──► Render CircularProgressIndicator
+       ▼
+[5] Server Merespons HTTP 200 OK
+       │  ─── Menerima String JSON Payload (10.634 karakter)
+       ▼
+[6] Deserialisasi JSON (jsonDecode)
+       │  ─── Mengubah string menjadi List&lt;dynamic&gt; (List of Map)
+       ▼
+[7] Mapping Data (Product.fromJson)
+       │  ─── title -&gt; name
+       │  ─── price (USD) -&gt; price (IDR)
+       │  ─── category API -&gt; category TokoKita
+       │  ─── rating.count -&gt; stock
+       │  ─── image -&gt; imageUrl
+       ▼
+[8] snapshot.hasData bernilai true
+       │
+       ▼
+[9] ListView.builder Me-render Daftar Produk
+       │
+       ▼
+[10] ProductCard Menampilkan Data di Layar (Nama, Harga Rupiah, Badge Stok, &amp; Gambar Asli)
+</code></pre>
+<hr />
+<h3>4. Perbandingan Struktur JSON Fake Store API vs Class Product Pertemuan 2</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Aspek / Properti</th>
+<th style="text-align: left;">Struktur JSON Fake Store API</th>
+<th style="text-align: left;">Struktur Class <code>Product</code> (Pertemuan 2)</th>
+<th style="text-align: left;">Penyesuaian pada Method <code>Product.fromJson</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Identitas Nama</strong></td>
+<td style="text-align: left;">Field berupa <code>title</code> (tipe <code>String</code>)</td>
+<td style="text-align: left;">Properti bernama <code>name</code> (tipe <code>String</code>)</td>
+<td style="text-align: left;">Melakukan pemetaan: <code>name: json['title'] ?? json['name'] ?? ''</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Harga Produk</strong></td>
+<td style="text-align: left;">Field <code>price</code> berupa pecahan dollar (USD, misal <code>109.95</code>)</td>
+<td style="text-align: left;">Properti <code>price</code> berupa mata uang Rupiah (IDR, ratusan ribu/jutaan)</td>
+<td style="text-align: left;">Membaca tipe data secara aman dengan <code>(json['price'] as num).toDouble()</code>. Untuk nilai dollar (&lt; 1000), dikalikan estimasi kurs Rp 15.000 agar serasi dengan <code>formatRupiah()</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Katalog Gambar</strong></td>
+<td style="text-align: left;">Field berupa <code>image</code> (URL string CDN)</td>
+<td style="text-align: left;">Properti berupa <code>imageUrl</code> (nullable <code>String?</code>)</td>
+<td style="text-align: left;">Melakukan pemetaan: <code>imageUrl: json['image'] ?? json['imageUrl']</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ketersediaan Stok</strong></td>
+<td style="text-align: left;"><strong>Tidak ada field stok</strong> pada Fake Store API</td>
+<td style="text-align: left;">Properti <code>stock</code> berstatus non-nullable <code>int</code></td>
+<td style="text-align: left;">Menghindari error null safety dengan mengambil nilai <code>rating['count']</code> atau nilai default <code>20</code> sebagai fallback.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Kategori</strong></td>
+<td style="text-align: left;">String bahasa Inggris huruf kecil (<em>men's clothing, electronics</em>)</td>
+<td style="text-align: left;">Kategori lokal TokoKita (<em>Elektronik, Fashion, Makanan</em>)</td>
+<td style="text-align: left;">Dibuat fungsi helper <code>_normalizeCategory()</code> untuk memetakan kategori API ke chip filter TokoKita.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Deskripsi</strong></td>
+<td style="text-align: left;">Field <code>description</code> (<code>String</code>)</td>
+<td style="text-align: left;">Properti <code>description</code> (nullable <code>String?</code>)</td>
+<td style="text-align: left;">Dipetakan langsung: <code>description: json['description']</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>5. Analisis Urgensi Pengecekan <code>response.statusCode</code> vs Blok <code>catch</code></h3>
+<p>Dalam arsitektur networking HTTP di Dart, <strong>blok <code>catch</code> HANYA akan dieksekusi apabila terjadi exception teknis pada level transport/koneksi</strong>, seperti:<br />
+- Tidak ada koneksi internet sama sekali (<code>SocketException</code>).<br />
+- Request mengalami timeout karena latency tinggi (<code>TimeoutException</code>).<br />
+- URL salah format atau server DNS gagal ditemukan (<code>FormatException</code>).</p>
+<p>Sebaliknya, apabila koneksi fisik ke server berhasil tersambung, tetapi endpoint tidak ditemukan (<strong>HTTP 404 Not Found</strong>) atau server mengalami error internal (<strong>HTTP 500 Internal Server Error</strong>), library <code>http</code> <strong>TIDAK AKAN melempar exception</strong>. Server tetap mengirimkan paket HTTP yang sah secara protokol, dengan header status code <code>404</code> atau <code>500</code> dan body yang biasanya berupa teks HTML error atau pesan JSON singkat seperti:</p>
+<pre><code class="language-json">{&quot;status&quot;: &quot;error&quot;, &quot;message&quot;: &quot;Product not found&quot;}
+</code></pre>
+<p>Jika aplikasi TokoKita <strong>tidak memeriksa <code>response.statusCode == 200</code></strong> dan langsung mengeksekusi <code>jsonDecode(response.body)</code>:<br />
+1. Aplikasi akan mencoba mem-parsing pesan error 404/500 sebagai daftar produk (<code>List&lt;Product&gt;</code>).<br />
+2. Proses ini akan memicu <em>unhandled runtime exception</em> (seperti <code>type 'String' is not a subtype of type 'List&lt;dynamic&gt;'</code> atau <code>NoSuchMethodError</code>).<br />
+3. Akibatnya, antarmuka aplikasi crash atau menampilkan layar merah (<em>red screen of death</em>).</p>
+<p>Oleh karena itu, pemeriksaan <code>if (response.statusCode == 200)</code> adalah <strong>lapisan validasi gerbang utama (<em>guard clause</em>)</strong> untuk memastikan bahwa data yang diterima benar-benar payload produk yang valid sebelum dialirkan ke parser JSON. Jika status code bukan 200, aplikasi dapat secara sengaja melempar <code>HttpException</code> yang ditangkap rapi oleh <code>FutureBuilder</code> untuk menampilkan antarmuka error yang elegan kepada pengguna.</p>
+<hr />
+<h2>G. Hasil Pengujian Otomatis (<code>flutter test</code> &amp; <code>flutter analyze</code>)</h2>
+<p>Seluruh rangkaian pengujian komprehensif dijalankan pada lingkungan proyek <code>tokokita</code>:</p>
+<pre><code>00:03 +17: All tests passed!
+</code></pre>
+<ol>
+<li><code>flutter analyze</code>: <strong>No issues found!</strong> (0 error, 0 warning, 0 lint issue).</li>
+<li><code>flutter test</code>: <strong>17 dari 17 unit &amp; widget tests lulus 100%</strong>:</li>
+<li>8 test mencakup pengujian Pertemuan 7 (parsing JSON Fake Store API, serialisasi <code>toJson</code>, real HTTP request logic, mock client, penanganan error status code, <code>FutureBuilder</code> state, tombol "Coba Lagi", <code>fetchProductDetail</code>, dan <code>RefreshIndicator</code>).</li>
+<li>9 test mencakup modul Pertemuan 1 s.d. 6 (<code>CartController</code>, <code>RxList</code>, <code>Obx</code>, navigasi <code>Get.to</code>/<code>Get.back</code>, <code>CartPage</code>, <code>CheckoutPage</code>, model <code>Product</code>, <code>DiscountedProduct</code>, dan <code>formatRupiah</code>).</li>
+</ol>
+<hr />
+<h2>H. Kesimpulan</h2>
+<p>Praktikum Pertemuan 7 berhasil mentransformasi aplikasi <strong>TokoKita</strong> dari aplikasi berbasis data statis menjadi aplikasi toko daring dinamis yang terhubung langsung dengan layanan REST API. </p>
+<p>Pencapaian utama praktikum ini meliputi:<br />
+1. <strong>Pemisahan Tanggung Jawab (<em>Separation of Concerns</em>)</strong>: Logika networking diisolasi di dalam <code>ProductService</code>, sehingga kode UI pada <code>HomePage</code> dan <code>ProductDetailPage</code> tetap bersih dan modular.<br />
+2. <strong>Robustness &amp; Error Resilience</strong>: Penerapan <code>try-catch</code> terpadu bersama validasi <code>response.statusCode</code> berhasil melindungi aplikasi dari potensi crash akibat gangguan sinyal maupun error server.<br />
+3. <strong>Pengalaman Pengguna (<em>User Experience</em>) yang Modern</strong>: Penggunaan <code>FutureBuilder</code>, <code>CircularProgressIndicator</code>, <code>RefreshIndicator</code>, dan tombol retry menyajikan umpan balik visual yang responsif.<br />
+4. <strong>Sinkronisasi Sempurna dengan Pertemuan 1-6</strong>: Objek <code>Product</code> hasil konsumsi REST API langsung kompatibel 100% dengan widget <code>ProductCard</code> (Pertemuan 4), sistem keranjang reaktif GetX <code>CartController</code> (Pertemuan 6), dan alur checkout pesanan.</p>
+</body>
+</html>
