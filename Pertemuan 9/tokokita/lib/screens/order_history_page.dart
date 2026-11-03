@@ -47,14 +47,20 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
       final statusFilter = _selectedStatus == 'Semua' ? null : _selectedStatus;
       final keyword = _searchController.text.trim();
 
-      final results = await OrderDatabase.instance.searchOrders(
-        status: statusFilter,
-        keyword: keyword.isEmpty ? null : keyword,
-      );
+      final results = await OrderDatabase.instance
+          .searchOrders(
+            status: statusFilter,
+            keyword: keyword.isEmpty ? null : keyword,
+          )
+          .timeout(const Duration(seconds: 4));
 
-      setState(() {
-        _orders = results;
-      });
+      if (mounted) {
+        setState(() {
+          _orders = results;
+        });
+      }
+    } catch (e) {
+      debugPrint('[OrderHistoryPage] Gagal memuat data pesanan: $e');
     } finally {
       if (mounted) {
         setState(() {

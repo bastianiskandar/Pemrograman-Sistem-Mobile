@@ -413,21 +413,27 @@ class CheckoutPage extends StatelessWidget {
                     // PERTEMUAN 9 LANGKAH 4 BUTIR 1 & TUGAS MANDIRI 2:
                     // Menyimpan data pesanan baru ke SQLite sebelum keranjang dikosongkan
                     // =========================================================
-                    final now = DateTime.now();
-                    final formattedDate =
-                        '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-                    final daftarItemStr = cartController.items
-                        .map((item) => '${item.product.name} (x${item.quantity})')
-                        .join(', ');
+                    try {
+                      final now = DateTime.now();
+                      final formattedDate =
+                          '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+                      final daftarItemStr = cartController.items
+                          .map((item) => '${item.product.name} (x${item.quantity})')
+                          .join(', ');
 
-                    final newOrder = Order(
-                      tanggal: formattedDate,
-                      daftarItem: daftarItemStr,
-                      totalHarga: cartController.totalHarga,
-                      status: 'Diproses',
-                    );
+                      final newOrder = Order(
+                        tanggal: formattedDate,
+                        daftarItem: daftarItemStr,
+                        totalHarga: cartController.totalHarga,
+                        status: 'Diproses',
+                      );
 
-                    await OrderDatabase.instance.insertOrder(newOrder);
+                      await OrderDatabase.instance
+                          .insertOrder(newOrder)
+                          .timeout(const Duration(seconds: 4));
+                    } catch (e) {
+                      debugPrint('[CheckoutPage] Gagal menyimpan pesanan ke SQLite: $e');
+                    }
 
                     // LANGKAH 4 BUTIR 3 & TUGAS MANDIRI 3:
                     // Menggunakan Get.off() untuk mensimulasikan perpindahan

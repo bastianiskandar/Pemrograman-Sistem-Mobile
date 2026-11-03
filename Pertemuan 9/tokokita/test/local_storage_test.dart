@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tokokita/models/order.dart';
+import 'package:tokokita/services/order_database.dart';
 import 'package:tokokita/services/wishlist_service.dart';
 
 void main() {
@@ -64,6 +65,54 @@ void main() {
       final updatedOrder = orderFromMap.copyWith(status: 'Selesai');
       expect(updatedOrder.status, 'Selesai');
       expect(updatedOrder.id, 1);
+    });
+
+    test('Langkah 4 & Tugas Mandiri 3: Operasi CRUD OrderDatabase & Pencarian WHERE', () async {
+      // 1. Insert Order
+      final order1 = Order(
+        tanggal: '03/11/2026 22:00',
+        daftarItem: 'Sepatu Running (x1)',
+        totalHarga: 350000.0,
+        status: 'Diproses',
+      );
+      final id1 = await OrderDatabase.instance.insertOrder(order1);
+      expect(id1, greaterThan(0));
+
+      final order2 = Order(
+        tanggal: '03/11/2026 22:30',
+        daftarItem: 'Kemeja Flannel (x2)',
+        totalHarga: 200000.0,
+        status: 'Selesai',
+      );
+      final id2 = await OrderDatabase.instance.insertOrder(order2);
+      expect(id2, greaterThan(id1));
+
+      // 2. Read All
+      final orders = await OrderDatabase.instance.getAllOrders();
+      expect(orders.length, 2);
+
+      // 3. Search / Filter WHERE status = 'Diproses'
+      final diproses = await OrderDatabase.instance.searchOrders(status: 'Diproses');
+      expect(diproses.length, 1);
+      expect(diproses.first.daftarItem, contains('Sepatu Running'));
+
+      // 4. Search / Filter WHERE keyword LIKE '%Flannel%'
+      final searchFlannel = await OrderDatabase.instance.searchOrders(keyword: 'Flannel');
+      expect(searchFlannel.length, 1);
+      expect(searchFlannel.first.status, 'Selesai');
+
+      // 5. Update Status
+      final updateResult = await OrderDatabase.instance.updateOrderStatus(id1, 'Selesai');
+      expect(updateResult, greaterThan(0));
+      final updatedOrders = await OrderDatabase.instance.searchOrders(status: 'Selesai');
+      expect(updatedOrders.length, 2);
+
+      // 6. Delete Order
+      final deleteResult = await OrderDatabase.instance.deleteOrder(id1);
+      expect(deleteResult, greaterThan(0));
+      final remaining = await OrderDatabase.instance.getAllOrders();
+      expect(remaining.length, 1);
+      expect(remaining.first.id, id2);
     });
   });
 }
